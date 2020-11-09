@@ -10,12 +10,32 @@
 
 
 int main(void) {
-    bloom_filter bf(65536);
+    bloom_filter bf(0.01, 1000);
     bf.insert("hello");
     bf.insert("dsfoier");
     bf.insert("2340x9xw");
     bf.insert("adfoiww3");
-    std::cout << bf.fill_ratio() << std::endl;
+    bf.insert("azxkjjww");
+    bf.insert("hellowrold");
+    bf.insert("wateroisawtoi");
+    bf.insert("worldlwld");
+    bf.insert("aodfierddd");
+    bf.insert("aowiercdidoiioo");
+    bf.insert("222wwxoxoisjjdls");
+    bf.insert("ssiduaooowrqwe");
+    bf.insert("a");
+    bf.insert("av");
+    bf.insert("23edi");
+    bf.insert("dddfkk");
+    bf.insert("eeeq");
+    bf.insert("yyy99");
+    bf.insert("eeeqood");
+    bf.insert("sdoieee");
+    bf.insert("d993jss");
+    bf.insert("heldoa");
+    bf.insert("ssdoo100");
+    std::cout << bf.contains("wer9xcc") << std::endl;
+    //std::cout << bf.fill_ratio() << std::endl;
     if(1) return 0;
 
 

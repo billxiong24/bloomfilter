@@ -6,12 +6,7 @@
 class atomic_bitset {
     public:
         static constexpr unsigned int WORD_SIZE_BITS = 8 * sizeof(unsigned int); 
-        //atomic_bitset() : num_set{0} {
-            //for (int i = 0; i < NUM_BITS/8 + 1; i++) {
-                //bit_arr[i] = 0;
-            //}
-        //}
-        atomic_bitset(unsigned int bits) : num_set{0}, num_bits{bits}, bit_arr{new std::atomic<unsigned int>[bits/8]} {
+        atomic_bitset(long bits) : num_set{0}, num_bits{bits}, bit_arr{new std::atomic<unsigned int>[bits/8 + 1]} {
             for (int i = 0; i < bits/8 + 1; i++) {
                 bit_arr[i] = 0;
             }
@@ -37,7 +32,7 @@ class atomic_bitset {
                     return 0;
                 //replace bit_arr[byte] with 1 iff bit_arr[byte] == curr_byte. Only if true, then ++num_set. 
                 std::atomic_compare_exchange_weak(&bit_arr[byte], &curr_byte, (unsigned int) (curr_byte | mask));
-                if(curr_byte == copy)
+                if (curr_byte == copy)
                     ++num_set;
             }
             else {
@@ -45,7 +40,7 @@ class atomic_bitset {
                     return 0;
                 //replace bit_arr[byte] with 0 iff bit_arr[byte] == curr_byte. Only if true, then --num_set. 
                 std::atomic_compare_exchange_weak(&bit_arr[byte], &curr_byte, (unsigned int) (curr_byte & ~mask));
-                if(curr_byte == copy)
+                if (curr_byte == copy)
                     --num_set;
             }
 
@@ -61,7 +56,7 @@ class atomic_bitset {
         }
 
         ~atomic_bitset() {
-            if(bit_arr)
+            if (bit_arr)
                 delete[] bit_arr;
         }
 
@@ -73,11 +68,10 @@ class atomic_bitset {
         inline unsigned int get_mask(size_t ind) {
             //assume WORD_SIZE_BITS power of 2
             return 1 << (ind & (WORD_SIZE_BITS - 1));
+            //return 1 << (ind % WORD_SIZE_BITS) ;
         }
 
-
-        //std::atomic<unsigned int> bit_arr[NUM_BITS/8 + 1];
-        std::atomic<unsigned int> *bit_arr;
+        std::atomic<unsigned int> *bit_arr = 0;
         long num_bits;
         std::atomic<size_t> num_set;
 };
