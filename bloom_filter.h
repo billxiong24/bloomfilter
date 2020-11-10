@@ -15,6 +15,14 @@ class bloom_filter {
 
         }
 
+        bloom_filter(const bloom_filter& bf) : 
+            filter(bf.filter.bits()), 
+            num_hashes(bf.num_hashes), 
+            num_el(bf.num_el), 
+            fill_num(bf.fill_num) {
+
+        }
+
         void insert(const std::string& key) {
             hash(key);
             //md5_buf is 128 bit

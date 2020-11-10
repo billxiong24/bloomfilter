@@ -6,13 +6,41 @@
 class atomic_bitset {
     public:
         static constexpr unsigned int WORD_SIZE_BITS = 8 * sizeof(unsigned int); 
+        //not thread safe
+        friend void swap(atomic_bitset& a, atomic_bitset& b) {
+            using std::swap;
+            swap(a.bit_arr, b.bit_arr);
+            swap(a.num_bits, b.num_bits);
+            a.num_set.exchange(b.num_set);
+        }
+
+
         atomic_bitset(long bits) : num_set{0}, num_bits{bits}, bit_arr{new std::atomic<unsigned int>[bits/8 + 1]} {
             for (int i = 0; i < bits/8 + 1; i++) {
                 bit_arr[i] = 0;
             }
         }
 
-        long bits() {
+        //copy is expensive
+        atomic_bitset(const atomic_bitset& bitset) : 
+            num_bits(bitset.num_bits), 
+            num_set(bitset.num_set.load(std::memory_order_relaxed)) {
+            for(int i = 0; i < bitset.num_bits; i++) {
+                bit_arr[i].store(bitset.bit_arr[i].load(std::memory_order_relaxed));
+            }
+        }
+
+        atomic_bitset& operator=(const atomic_bitset other) {
+            return *this;
+        }
+
+        atomic_bitset(atomic_bitset&& other) : 
+            num_bits(other.num_bits), 
+            num_set(other.num_set.load(std::memory_order_relaxed)) {
+
+        }
+
+        long bits() const {
             return num_bits;
         }
 
