@@ -2,9 +2,9 @@
 #define BLOOM_FILTER_H
 #include "atomic_bitset.h"
 #include <bitset>
-#include <openssl/md5.h>
 #include <iostream>
 #include <math.h>
+#include "murmur3.h"
 
 class bloom_filter {
     public:
@@ -12,13 +12,12 @@ class bloom_filter {
             num_el(0), 
             fill_num(0), 
             filter(get_optimal_size(prob_false_pos, expected_num_el)) {
-
         }
 
         void insert(const std::string& key) {
             hash(key);
-            //md5_buf is 128 bit
-            const uint64_t *ptr = (const uint64_t *) md5_buf;
+            //hash_buf is 128 bit
+            const uint64_t *ptr = (const uint64_t *) hash_buf;
             const uint64_t hash1 = ptr[0];
             const uint64_t hash2 = ptr[1];
             int num_set = 0;
@@ -32,7 +31,7 @@ class bloom_filter {
 
         bool contains(const std::string& key) {
             hash(key);
-            const uint64_t *ptr = (const uint64_t *) md5_buf;
+            const uint64_t *ptr = (const uint64_t *) hash_buf;
             const uint64_t hash1 = ptr[0];
             const uint64_t hash2 = ptr[1];
             int num_set = 0;
@@ -54,7 +53,7 @@ class bloom_filter {
 
     private:
         void hash(const std::string& key) {
-            MD5((const unsigned char*) key.c_str(), key.size(), md5_buf);
+            MurmurHash3_x64_128(key.data(), key.size(), SEED, (void *) hash_buf);
         }
 
         bool insert_slice(int ind, uint64_t hash1, uint64_t hash2) {
@@ -74,10 +73,11 @@ class bloom_filter {
             return optimal_size;
         }
 
-        static constexpr int MD5_SIZE = 16;
+        static constexpr int HASH_BUF_SIZE = 4;
         static constexpr double LN2 = 0.69314718056;
+        static constexpr uint32_t SEED = 0x1C948969;
         //align to 16 byte boundary
-        unsigned char md5_buf alignas(MD5_SIZE) [MD5_SIZE];
+        uint32_t hash_buf alignas(HASH_BUF_SIZE) [HASH_BUF_SIZE];
         //std::bitset<NUM_BITS>nonatomic_filter;
         atomic_bitset filter;
 
