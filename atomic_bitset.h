@@ -3,6 +3,7 @@
 #include <atomic>
 #include <iostream>
 #include "copyable_atomic.h"
+#define BITS_IN_BYTE 8
 
 class atomic_bitset {
     public:
@@ -12,9 +13,22 @@ class atomic_bitset {
         //custom buffer
         atomic_bitset(copyable_atomic<unsigned int> *buf, long bits); 
 
+        //not thread safe
         atomic_bitset(const atomic_bitset& other);
         atomic_bitset& operator=(atomic_bitset other);
         atomic_bitset(atomic_bitset&& other);
+
+        atomic_bitset operator |(const atomic_bitset& other);
+        atomic_bitset operator &(const atomic_bitset& other);
+        atomic_bitset operator ^(const atomic_bitset& other);
+        atomic_bitset operator <<(const atomic_bitset& other);
+        atomic_bitset operator >>(const atomic_bitset& other);
+
+        atomic_bitset& operator |=(const atomic_bitset& other);
+        atomic_bitset& operator &=(const atomic_bitset& other);
+        atomic_bitset& operator ^=(const atomic_bitset& other);
+        atomic_bitset& operator <<=(const atomic_bitset& other);
+        atomic_bitset& operator >>=(const atomic_bitset& other);
 
         //number of bits 
         long bits() const;
@@ -50,6 +64,9 @@ class atomic_bitset {
             //return 1 << (ind % WORD_SIZE_BITS);
         }
 
+        inline size_t get_arrlen() {
+            return num_bits/BITS_IN_BYTE/sizeof(unsigned int) + 1;
+        }
 
         copyable_atomic<unsigned int> *bit_arr = 0;
         long num_bits;
