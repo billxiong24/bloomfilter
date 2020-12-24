@@ -14,12 +14,12 @@ atomic_bitset::atomic_bitset(long bits) :
 
 atomic_bitset::atomic_bitset(copyable_atomic<unsigned int> *buf, long bits) : num_set{0}, num_bits{bits}, bit_arr{buf} {}
 
-
-atomic_bitset::atomic_bitset(atomic_bitset& other) : atomic_bitset(other.num_bits) {
+atomic_bitset::atomic_bitset(const atomic_bitset& other) : atomic_bitset(other.num_bits) {
     num_set = other.num_set;
     for (int i = 0; i < other.num_bits/BITS_IN_BYTE/sizeof(unsigned int) + 1; i++) {
         bit_arr[i] = other.bit_arr[i];
     }
+
 }
 
 atomic_bitset::atomic_bitset(atomic_bitset&& other) :atomic_bitset(other.num_bits) {

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <type_traits>
 #include <bitset>
 #include <stdio.h>
 #include "bloom_filter.h"
@@ -11,6 +12,12 @@
 
 int main(void) {
     redis_writer wt("127.0.0.1", 6379);
+
+    auto val = std::is_copy_constructible<copyable_atomic<unsigned int>>::value;
+    auto val2 = std::is_copy_constructible<bloom_filter>::value;
+    std::cout << val << std::endl;
+    std::cout << val2 << std::endl;
+    std::cout << "=====" << std::endl;
 
 
     //wt.serialize(bs1.bit_arr, bytes);
@@ -45,6 +52,12 @@ int main(void) {
     std::cout << bf.contains("yyy99") << std::endl;
     std::cout << bf.contains("hello") << std::endl;
     std::cout << bf.fill_ratio() << std::endl;
+    bloom_filter bf2(bf);
+    std::cout << "---test---" << std::endl;
+    std::cout << bf2.contains("yyy99")<< std::endl;
+    bf2.insert("55555544444");
+    std::cout << bf2.contains("55555544444") << std::endl;
+    std::cout << bf.contains("55555544444") << std::endl;
     if(1) return 0;
 
 

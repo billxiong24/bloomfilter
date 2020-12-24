@@ -12,7 +12,7 @@ class atomic_bitset {
         //custom buffer
         atomic_bitset(copyable_atomic<unsigned int> *buf, long bits); 
 
-        atomic_bitset(atomic_bitset& other);
+        atomic_bitset(const atomic_bitset& other);
         atomic_bitset& operator=(atomic_bitset other);
         atomic_bitset(atomic_bitset&& other);
 
