@@ -51,6 +51,10 @@ class bloom_filter {
             return ((double) filter.num_filled()) / filter.bits();
         }
 
+        const bloom_filter operator^(const bloom_filter& bf) {
+            return *this;
+        }
+
     private:
         void hash(const std::string& key) {
             MurmurHash3_x64_128(key.data(), key.size(), SEED, (void *) hash_buf);

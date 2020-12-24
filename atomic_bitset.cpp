@@ -1,13 +1,36 @@
 #include "atomic_bitset.h"
+#define BITS_IN_BYTE 8
 
 //constructor not thread safe
-atomic_bitset::atomic_bitset(long bits) : num_set{0}, num_bits{bits}, bit_arr{new std::atomic<unsigned int>[bits/8 + 1]} {
-    for (int i = 0; i < bits/8 + 1; i++) {
+atomic_bitset::atomic_bitset(long bits) : 
+    num_set{0}, 
+    num_bits{bits}, 
+    bit_arr{new copyable_atomic<unsigned int>[bits/BITS_IN_BYTE/sizeof(unsigned int) + 1]} {
+
+    for (int i = 0; i < bits/BITS_IN_BYTE/sizeof(unsigned int) + 1; i++) {
         bit_arr[i] = 0;
     }
 }
 
-atomic_bitset::atomic_bitset(std::atomic<unsigned int> *buf, long bits) : num_set{0}, num_bits{bits}, bit_arr{buf} {}
+atomic_bitset::atomic_bitset(copyable_atomic<unsigned int> *buf, long bits) : num_set{0}, num_bits{bits}, bit_arr{buf} {}
+
+
+atomic_bitset::atomic_bitset(atomic_bitset& other) : atomic_bitset(other.num_bits) {
+    num_set = other.num_set;
+    for (int i = 0; i < other.num_bits/BITS_IN_BYTE/sizeof(unsigned int) + 1; i++) {
+        bit_arr[i] = other.bit_arr[i];
+    }
+}
+
+atomic_bitset::atomic_bitset(atomic_bitset&& other) :atomic_bitset(other.num_bits) {
+    swap(*this, other);
+}
+
+atomic_bitset& atomic_bitset::operator=(atomic_bitset other) {
+    swap(*this, other);
+    return *this;
+}
+
 
 long atomic_bitset::bits() const {
     return num_bits;
@@ -44,10 +67,6 @@ bool atomic_bitset::set(size_t ind, bool val) {
     return curr_byte == copy;
 }
 
-inline bool atomic_bitset::get(size_t ind) {
-    return bit_arr[get_byte(ind)].load(std::memory_order_relaxed) & get_mask(ind);
-}
-
 bool atomic_bitset::operator[](size_t ind) {
     return get(ind);
 }
@@ -55,13 +74,4 @@ bool atomic_bitset::operator[](size_t ind) {
 atomic_bitset::~atomic_bitset() {
     if (bit_arr)
         delete[] bit_arr;
-}
-
-inline unsigned int atomic_bitset::get_byte(size_t ind) {
-    return ind / WORD_SIZE_BITS;
-}
-inline unsigned int atomic_bitset::get_mask(size_t ind) {
-    //assume WORD_SIZE_BITS power of 2
-    return 1 << (ind & (WORD_SIZE_BITS - 1));
-    //return 1 << (ind % WORD_SIZE_BITS);
 }

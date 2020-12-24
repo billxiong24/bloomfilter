@@ -4,10 +4,16 @@
 #include "bloom_filter.h"
 #include "atomic_bitset.h"
 #include "murmur3.h"
+#include "redis_writer.h"
 #include <vector>
 #include <thread>
+#include "copyable_atomic.h"
 
 int main(void) {
+    redis_writer wt("127.0.0.1", 6379);
+
+
+    //wt.serialize(bs1.bit_arr, bytes);
     bloom_filter bf(0.01, 1000);
     bf.insert("wat");
     bf.insert("wat2");
