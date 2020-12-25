@@ -13,11 +13,18 @@
 int main(void) {
     redis_writer wt("127.0.0.1", 6379);
 
-    auto val = std::is_copy_constructible<copyable_atomic<unsigned int>>::value;
-    auto val2 = std::is_copy_constructible<bloom_filter>::value;
-    std::cout << val << std::endl;
-    std::cout << val2 << std::endl;
-    std::cout << "=====" << std::endl;
+    bloom_filter bf1(0.01, 1000);
+    bloom_filter bf4(0.01, 1000);
+    bf1.insert("words");
+    bf1 ^= bf4;
+    //bf1.insert("wtaoi");
+    //bf1.insert("teen");
+    //bf4.insert("nextttt");
+    std::cout << bf1.contains("words") << std::endl;
+
+    //bf1 |= bf4;
+    if(true)
+        return 1;
 
 
     //wt.serialize(bs1.bit_arr, bytes);

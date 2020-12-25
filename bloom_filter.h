@@ -13,9 +13,34 @@ class bloom_filter {
         bool contains(const std::string& key);
         size_t size();
         double fill_ratio();
-        const bloom_filter operator^(const bloom_filter& bf);
+
+        bloom_filter operator |(const bloom_filter& other);
+        bloom_filter operator &(const bloom_filter& other);
+        bloom_filter operator ^(const bloom_filter& other);
+        bloom_filter operator <<(const bloom_filter& other);
+        bloom_filter operator >>(const bloom_filter& other);
+
+        bloom_filter& operator |=(const bloom_filter& other);
+        bloom_filter& operator &=(const bloom_filter& other);
+        bloom_filter& operator ^=(const bloom_filter& other);
+        bloom_filter& operator <<=(const bloom_filter& other);
+        bloom_filter& operator >>=(const bloom_filter& other);
 
     private:
+        inline void set_ind(
+                atomic_bitset& filter, 
+                const atomic_bitset& other_filter,
+                std::function<bool(bool, bool)> fn) {
+
+            size_t sz = filter.bits();
+            size_t other_sz = other_filter.bits();
+
+            for (int i = 0; i < sz; i++) {
+                filter.set(i, fn(filter[i], other_filter[i]));
+            }
+        }
+
+
         void hash(const std::string& key);
         bool insert_slice(int ind, uint64_t hash1, uint64_t hash2); 
         long get_optimal_size(double prob_false_pos, long expected_num_el);

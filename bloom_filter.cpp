@@ -3,7 +3,60 @@ bloom_filter::bloom_filter(double prob_false_pos, long expected_num_el) :
     num_el(0), 
     fill_num(0), 
     filter(get_optimal_size(prob_false_pos, expected_num_el)) {
-    }
+}
+
+bloom_filter bloom_filter::operator |(const bloom_filter& other){
+    bloom_filter tmp(*this);
+    set_ind(tmp.filter, other.filter, std::bit_or<bool>());
+    return tmp;
+}
+
+bloom_filter bloom_filter::operator &(const bloom_filter& other) {
+    bloom_filter tmp(*this);
+    set_ind(tmp.filter, other.filter, std::bit_and<bool>());
+    return tmp;
+}
+
+bloom_filter bloom_filter::operator ^(const bloom_filter& other){
+    bloom_filter tmp(*this);
+    set_ind(tmp.filter, other.filter, std::bit_xor<bool>());
+    return tmp;
+}
+
+bloom_filter bloom_filter::operator <<(const bloom_filter& other){
+    bloom_filter tmp(*this);
+    return tmp;
+}
+
+bloom_filter bloom_filter::operator >>(const bloom_filter& other){
+    bloom_filter tmp(*this);
+    return tmp;
+}
+
+bloom_filter& bloom_filter::operator |=(const bloom_filter& other){
+    set_ind(filter, other.filter, std::bit_or<bool>());
+    return *this;
+}
+
+bloom_filter& bloom_filter::operator &=(const bloom_filter& other){
+    set_ind(filter, other.filter, std::bit_and<bool>());
+    return *this;
+}
+
+bloom_filter& bloom_filter::operator ^=(const bloom_filter& other){
+    set_ind(filter, other.filter, std::bit_xor<bool>());
+    return *this;
+}
+
+bloom_filter& bloom_filter::operator <<=(const bloom_filter& other){
+    this->operator<<(other);
+    return *this;
+}
+
+bloom_filter& bloom_filter::operator >>=(const bloom_filter& other) {
+    this->operator>>(other);
+    return *this;
+}
 
 void bloom_filter::insert(const std::string& key) {
     hash(key);
@@ -40,10 +93,6 @@ size_t bloom_filter::size() {
 
 double bloom_filter::fill_ratio() {
     return ((double) filter.num_filled()) / filter.bits();
-}
-
-const bloom_filter bloom_filter::operator^(const bloom_filter& bf) {
-    return *this;
 }
 
 void bloom_filter::hash(const std::string& key) {

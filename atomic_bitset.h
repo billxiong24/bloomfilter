@@ -18,18 +18,6 @@ class atomic_bitset {
         atomic_bitset& operator=(atomic_bitset other);
         atomic_bitset(atomic_bitset&& other);
 
-        atomic_bitset operator |(const atomic_bitset& other);
-        atomic_bitset operator &(const atomic_bitset& other);
-        atomic_bitset operator ^(const atomic_bitset& other);
-        atomic_bitset operator <<(const atomic_bitset& other);
-        atomic_bitset operator >>(const atomic_bitset& other);
-
-        atomic_bitset& operator |=(const atomic_bitset& other);
-        atomic_bitset& operator &=(const atomic_bitset& other);
-        atomic_bitset& operator ^=(const atomic_bitset& other);
-        atomic_bitset& operator <<=(const atomic_bitset& other);
-        atomic_bitset& operator >>=(const atomic_bitset& other);
-
         //number of bits 
         long bits() const;
         //number of bits == 1
@@ -37,11 +25,15 @@ class atomic_bitset {
         //set bit at ind to val
         bool set(size_t ind, bool val);
         //get bit at index ind
-        inline bool get(size_t ind) {
+        inline bool get(size_t ind) const {
             return bit_arr[get_byte(ind)].load(std::memory_order_relaxed) & get_mask(ind);
         }
         //equivalent to get
-        bool operator[](size_t ind);
+        bool operator[](size_t ind) const;
+
+        inline size_t len() const {
+            return num_bits/BITS_IN_BYTE/sizeof(unsigned int) + 1;
+        }
         
         //not thread safe
 
@@ -55,17 +47,13 @@ class atomic_bitset {
         }
 
     private:
-        inline unsigned int get_byte(size_t ind) {
+        inline unsigned int get_byte(size_t ind) const {
             return ind / WORD_SIZE_BITS;
         } 
-        inline unsigned int get_mask(size_t ind) {
+        inline unsigned int get_mask(size_t ind) const {
             //assume WORD_SIZE_BITS power of 2
             return 1 << (ind & (WORD_SIZE_BITS - 1));
             //return 1 << (ind % WORD_SIZE_BITS);
-        }
-
-        inline size_t get_arrlen() {
-            return num_bits/BITS_IN_BYTE/sizeof(unsigned int) + 1;
         }
 
         copyable_atomic<unsigned int> *bit_arr = 0;
