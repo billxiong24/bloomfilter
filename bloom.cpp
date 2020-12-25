@@ -20,11 +20,6 @@ int main(void) {
     //bf1.insert("wtaoi");
     //bf1.insert("teen");
     //bf4.insert("nextttt");
-    std::cout << bf1.contains("words") << std::endl;
-
-    //bf1 |= bf4;
-    if(true)
-        return 1;
 
 
     //wt.serialize(bs1.bit_arr, bytes);

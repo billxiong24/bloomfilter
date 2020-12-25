@@ -17,14 +17,10 @@ class bloom_filter {
         bloom_filter operator |(const bloom_filter& other);
         bloom_filter operator &(const bloom_filter& other);
         bloom_filter operator ^(const bloom_filter& other);
-        bloom_filter operator <<(const bloom_filter& other);
-        bloom_filter operator >>(const bloom_filter& other);
 
         bloom_filter& operator |=(const bloom_filter& other);
         bloom_filter& operator &=(const bloom_filter& other);
         bloom_filter& operator ^=(const bloom_filter& other);
-        bloom_filter& operator <<=(const bloom_filter& other);
-        bloom_filter& operator >>=(const bloom_filter& other);
 
     private:
         inline void set_ind(

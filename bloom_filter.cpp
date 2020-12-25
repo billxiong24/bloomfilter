@@ -23,16 +23,6 @@ bloom_filter bloom_filter::operator ^(const bloom_filter& other){
     return tmp;
 }
 
-bloom_filter bloom_filter::operator <<(const bloom_filter& other){
-    bloom_filter tmp(*this);
-    return tmp;
-}
-
-bloom_filter bloom_filter::operator >>(const bloom_filter& other){
-    bloom_filter tmp(*this);
-    return tmp;
-}
-
 bloom_filter& bloom_filter::operator |=(const bloom_filter& other){
     set_ind(filter, other.filter, std::bit_or<bool>());
     return *this;
@@ -45,16 +35,6 @@ bloom_filter& bloom_filter::operator &=(const bloom_filter& other){
 
 bloom_filter& bloom_filter::operator ^=(const bloom_filter& other){
     set_ind(filter, other.filter, std::bit_xor<bool>());
-    return *this;
-}
-
-bloom_filter& bloom_filter::operator <<=(const bloom_filter& other){
-    this->operator<<(other);
-    return *this;
-}
-
-bloom_filter& bloom_filter::operator >>=(const bloom_filter& other) {
-    this->operator>>(other);
     return *this;
 }
 
